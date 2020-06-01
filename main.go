@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 
 	"github.com/jedib0t/go-pretty/table"
 	parrotyschema "github.com/supersingh05/parroty/pkg/schema"
@@ -102,6 +103,7 @@ func main() {
 				cr.AddCheck(t, true)
 			}
 		}
+		sort.Slice(cr.Checks, func(i, j int) bool { return cr.Checks[i].Namespace < cr.Checks[j].Namespace })
 		resp.AddClusterResponse(cr)
 	}
 	printResponse(resp)
