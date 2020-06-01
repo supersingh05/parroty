@@ -17,6 +17,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -37,9 +38,11 @@ import (
 
 func main() {
 	// cmd.Execute()
-
+	var yamlPath string
+	flag.StringVar(&yamlPath, "config", "", "path to spec config")
+	flag.Parse()
 	p := parrotyschema.Parroty{}
-	yamlFile, err := ioutil.ReadFile("./example.yaml")
+	yamlFile, err := ioutil.ReadFile(yamlPath)
 	if err != nil {
 		fmt.Printf("Error reading YAML file: %s\n", err)
 		return
