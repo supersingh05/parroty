@@ -50,6 +50,7 @@ func main() {
 	}
 
 	modifyExpects(&p)
+	resp := parrotyschema.Response{}
 	for _, s := range p.Clusters {
 		config, err := setupKubeClient(s.KubeconfigPath, s.Context)
 		if err != nil {
@@ -63,6 +64,9 @@ func main() {
 		if errClient != nil {
 			fmt.Println("error in dyrnamic client")
 		}
+		cr := parrotyschema.ClusterResponse{}
+		cr.Name = s.Name
+		cr.Type = s.Cloud
 		for _, t := range s.ClusterExpect {
 			gvk := schema.GroupKind{}
 			gvk.Group = t.Group
@@ -80,13 +84,16 @@ func main() {
 			}
 			_, err = x.Get(context.TODO(), t.ObjectName, metav1.GetOptions{})
 			if err != nil {
-				fmt.Println("Cluster: " + s.Name + " does NOT have resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
+				cr.AddCheck(t, false)
+				// fmt.Println("Cluster: " + s.Name + " does NOT have resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
 			} else {
-				fmt.Println("Cluster: " + s.Name + " has resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
+				cr.AddCheck(t, true)
+				// fmt.Println("Cluster: " + s.Name + " has resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
 			}
 		}
+		resp.AddClusterResponse(cr)
 	}
-
+	fmt.Println(resp)
 }
 
 func modifyExpects(parroty *parrotyschema.Parroty) {

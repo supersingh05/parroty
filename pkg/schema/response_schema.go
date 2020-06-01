@@ -15,21 +15,14 @@ type Check struct {
 	Passed bool
 }
 
-func (r *Response) addClusters(clusters []Cluster) {
-	// for i, s := range clusters.GkeCluster {
-	// 	cr:= ClusterResponse{
-	// 		Name: s.Name,
-	// 		Type: "GKE",
-	// 	}
+func (r *Response) AddClusterResponse(cr ClusterResponse) {
+	r.ClusterResponses = append(r.ClusterResponses, cr)
+}
 
-	// 	r.ClusterResponses = append(s.ClusterExpect, parroty.GlobalExpect.ClusterExpect...)
-	// }
-
-	// for i, s := range clusters.EksCluster {
-	// 	parroty.Clusters.Cluster[i].ClusterExpect = append(s.ClusterExpect, parroty.GlobalExpect.ClusterExpect...)
-	// }
-
-	// for i, s := range clusters.Cluster {
-	// 	parroty.Clusters.Cluster[i].ClusterExpect = append(s.ClusterExpect, parroty.GlobalExpect.ClusterExpect...)
-	// }
+func (cr *ClusterResponse) AddCheck(ce ClusterExpect, passed bool) {
+	c := Check{
+		ClusterExpect: ce,
+		Passed:        passed,
+	}
+	cr.Checks = append(cr.Checks, c)
 }
