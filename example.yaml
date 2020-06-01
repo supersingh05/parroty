@@ -1,0 +1,24 @@
+clusters:
+    - name: docker-desktop
+      context: docker-desktop
+      kubeconfigPath: /Users/asavirkalla/.kube/config
+      clusterExpect:
+        - objectName: kubernetes
+          kind: Service
+          group: ""
+          version: "v1"
+          namespace: default
+globalExpect:
+    - objectName: default
+      kind: Namespace
+      group: ""
+      version: "v1"
+    - objectName: nope
+      kind: Namespace
+      group: ""
+      version: "v1"
+    - objectName: my-nginx
+      namespace: default
+      kind: Deployment
+      group: "apps"
+      version: "v1"
