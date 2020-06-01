@@ -6,13 +6,15 @@ type Parroty struct {
 }
 
 type Cluster struct {
-	Name           string          `yaml:"name"`
-	Context        string          `yaml:"context"`
-	Cloud          string          `yaml:"cloud,omitempty"`
-	ClusterExpect  []ClusterExpect `yaml:"clusterExpect,omitempty"`
-	KubeconfigPath string          `yaml:"kubeconfigPath,omitempty"`
-	AwsSecretKey   string          `yaml:"awsSecretKey,omitempty"`
-	AwsAccessKey   string          `yaml:"awsAccessKey,omitempty"`
+	Name             string          `yaml:"name"`
+	Context          string          `yaml:"context"`
+	Cloud            string          `yaml:"cloud,omitempty"`
+	ClusterExpect    []ClusterExpect `yaml:"clusterExpect,omitempty"`
+	KubeconfigPath   string          `yaml:"kubeconfigPath,omitempty"`
+	AwsSecretKey     string          `yaml:"awsSecretKey,omitempty"`
+	AwsAccessKey     string          `yaml:"awsAccessKey,omitempty"`
+	AwsSecurityToken string          `yaml:"awsSecurityToken,omitempty"`
+	AwsSessionToken  string          `yaml:"awsSessionToken,omitempty"`
 }
 
 type ClusterExpect struct {

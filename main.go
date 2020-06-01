@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 
 	parrotyschema "github.com/supersingh05/parroty/pkg/schema"
 	"gopkg.in/yaml.v2"
@@ -64,6 +65,13 @@ func main() {
 		if errClient != nil {
 			fmt.Println("error in dyrnamic client")
 		}
+		if len(s.AwsAccessKey) != 0 {
+			os.Setenv("AWS_SESSION_TOKEN", s.AwsSessionToken)
+			os.Setenv("AWS_ACCESS_KEY_ID", s.AwsAccessKey)
+			os.Setenv("AWS_SECRET_ACCESS_KEY", s.AwsSecretKey)
+			os.Setenv("AWS_SECURITY_TOKEN", s.AwsSecurityToken)
+		}
+
 		cr := parrotyschema.ClusterResponse{}
 		cr.Name = s.Name
 		cr.Type = s.Cloud
