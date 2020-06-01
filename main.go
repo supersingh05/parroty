@@ -23,7 +23,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v6/table"
 	parrotyschema "github.com/supersingh05/parroty/pkg/schema"
 	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -118,6 +118,7 @@ func printResponse(resp parrotyschema.Response) {
 		for _, check := range cr.Checks {
 			t.AppendRow(table.Row{cr.Name, check.Group + "/" + check.Version + " " + check.Kind, check.Namespace, check.ObjectName, check.Passed})
 		}
+		t.AppendSeparator()
 	}
 	t.Render()
 }
