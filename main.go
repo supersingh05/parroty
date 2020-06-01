@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	parrotyschema "github.com/supersingh05/parroty/pkg/schema"
@@ -30,6 +29,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
@@ -52,17 +52,18 @@ func main() {
 
 	modifyExpects(&p)
 	resp := parrotyschema.Response{}
+
 	for _, s := range p.Clusters {
 		config, err := setupKubeClient(s.KubeconfigPath, s.Context)
 		if err != nil {
 			fmt.Println("failing in config")
 			// log.Fatal(err)
 		}
-
 		dc, err := discovery.NewDiscoveryClientForConfig(config)
 		mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dc))
 		dynClient, errClient := dynamic.NewForConfig(config)
 		if errClient != nil {
+			fmt.Println(err)
 			fmt.Println("error in dyrnamic client")
 		}
 		if len(s.AwsAccessKey) != 0 {
@@ -82,7 +83,7 @@ func main() {
 			mapping, err := mapper.RESTMapping(gvk, t.Version)
 			if err != nil {
 				fmt.Println("mapping didnt work")
-				log.Fatal(err)
+				continue
 			}
 			var x dynamic.ResourceInterface
 			if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
@@ -93,15 +94,26 @@ func main() {
 			_, err = x.Get(context.TODO(), t.ObjectName, metav1.GetOptions{})
 			if err != nil {
 				cr.AddCheck(t, false)
-				// fmt.Println("Cluster: " + s.Name + " does NOT have resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
 			} else {
 				cr.AddCheck(t, true)
-				// fmt.Println("Cluster: " + s.Name + " has resource: " + t.ObjectName + " " + t.Group + "/" + t.Version + " " + t.Kind + " in namespace: " + t.Namespace)
 			}
 		}
 		resp.AddClusterResponse(cr)
 	}
-	fmt.Println(resp)
+	printResponse(resp)
+}
+
+func printResponse(resp parrotyschema.Response) {
+	for _, cr := range resp.ClusterResponses {
+		fmt.Println("For cluster: " + cr.Name)
+		for _, check := range cr.Checks {
+			if check.Passed {
+				fmt.Println(check.Group + "/" + check.Version + " " + check.Kind + " in ns:" + check.Namespace + " named: " + check.ObjectName + " " + "PASSED")
+			} else {
+				fmt.Println(check.Group + "/" + check.Version + " " + check.Kind + " in ns:" + check.Namespace + " named: " + check.ObjectName + " " + "FAIL")
+			}
+		}
+	}
 }
 
 func modifyExpects(parroty *parrotyschema.Parroty) {
